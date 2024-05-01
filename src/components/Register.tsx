@@ -5,7 +5,7 @@ import { useUserStore } from "../stores/userStore"
 import { GraphQLErrorExtensions } from "graphql"
 import useGeneralStore from "../stores/generalStore"
 import { RegisterUserMutation } from '../gql/graphql';
-import TextInput from './Input';
+import TextInput from './TextInput';
 
 const Register = () => {
   const [registerUser, { loading, error, data }] = useMutation<RegisterUserMutation>(REGISTER_USER)
@@ -25,26 +25,47 @@ const Register = () => {
 
   const handleRegister = async () => {
     setErrors({})
-    await registerUser({
-      variables: {
-        email: registerData.email,
-        password: registerData.password,
-        fullname: registerData.fullName,
-        confirmPassword: registerData.confirmPassword,
-      },
-    }).catch((error)=> {
-      console.log(error?.graphQLErrors)
-      const validationErrors = error.graphQLErrors[0].extensions
-      setErrors(validationErrors)
-    })
-    if (data?.register.user) {
-      setUser({
-        id: data?.register.user.id,
-        email: data?.register.user.email,
-        fullname: data?.register.user.fullname,
+    // 这里不应该是调用registerUser, 然后拿useMutation中的data吗？
+    try {
+      const response = await registerUser({
+        variables: {
+          email: registerData.email,
+          password: registerData.password,
+          fullname: registerData.fullName,
+          confirmPassword: registerData.confirmPassword,
+        },
+      })
+      response && response.data && setUser({
+        id: response.data.register?.user?.id,
+        email: response.data.register?.user?.email as string,
+        fullname: response.data.register?.user?.fullname as string,
       });
-      setIsLoginOpen(false)
-    } 
+      setIsLoginOpen(false);
+    } catch (_) {
+    }
+    if (error) {
+      setErrors(error.graphQLErrors[0].extensions)
+    }
+    // await registerUser({
+    //   variables: {
+    //     email: registerData.email,
+    //     password: registerData.password,
+    //     fullname: registerData.fullName,
+    //     confirmPassword: registerData.confirmPassword,
+    //   },
+    // }).catch((error)=> {
+    //   console.log(error?.graphQLErrors)
+    //   const validationErrors = error.graphQLErrors[0].extensions
+    //   setErrors(validationErrors)
+    // })
+    // if (data?.register.user) {
+    //   setUser({
+    //     id: data?.register.user.id,
+    //     email: data?.register.user.email,
+    //     fullname: data?.register.user.fullname,
+    //   });
+    //   setIsLoginOpen(false)
+    // } 
   }
 
   return (

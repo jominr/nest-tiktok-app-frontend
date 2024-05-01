@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 
 export interface User {
-  id?: string | number;
+  id?: number;
   fullname: string;
   email: string;
   bio?: string;
@@ -19,7 +19,7 @@ export const useUserStore = create<User & UserActions>()(
     persist(
       (set) => ({
         // 初始化数据
-        id: "",
+        id: undefined,
         fullname: "",
         email: "",
         bio: "",
@@ -27,7 +27,7 @@ export const useUserStore = create<User & UserActions>()(
 
         setUser: (user) => set(user),
         logout: () => {
-          set({ id: "", fullname: "", email: "", bio: "", image: "" })
+          set({ id: undefined, fullname: "", email: "", bio: "", image: "" })
         }
       }),
       {
