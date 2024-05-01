@@ -19,9 +19,11 @@ const MainLayout = ({children}: Props) => {
           "flex justify-between mx-auto w-full lg:px-2.5 px-0"
         ].join(" ")}
       >
-        <SideNav />
+        <div>
+          <SideNav />
+        </div>
+        {children}
       </div>
-      {children}
     </div>
   );
 };
